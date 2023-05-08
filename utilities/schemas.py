@@ -1,15 +1,16 @@
 from pydantic import BaseModel
 
+
 class BookSchema(BaseModel):
-    name: str
+    id: str
+    title: str
     author: str
-    price: float
-    pages: int
-    rating: float
-    coverPhoto: str
-    visits: int
     description: str
-    noOfCopies: int
+    price: int
+    image: str
+    link: str
+    
+
 
 class UpdateBookRating(BaseModel):
     rating: float
