@@ -1,9 +1,11 @@
 from fastapi import FastAPI, Response
-from routes import test, utilities
+from routes import read, test, create
 from json import dumps
 
 app = FastAPI()
 app.include_router(test.router)
+app.include_router(read.router)
+app.include_router(create.router)
 
 @app.get("/")
 async def home():
@@ -12,3 +14,4 @@ async def home():
         status_code=200,
         media_type="application/json"
     )
+

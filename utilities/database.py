@@ -8,18 +8,18 @@ load_dotenv()
 
 class Book:
     def __init__(
-            self, 
-            id: str, 
+            self,  
             title: str, 
             author: str, 
             description: str, 
             price: int, 
             image: str, 
             link: str, 
-            rating: float, 
-            totalRatingCount: int
+            rating: float = 0, 
+            totalRatingCount: int = 1,
+            *args,
+            **kwargs
         ) -> None:
-        self.id = id
         self.title = title
         self.author = author
         self.description = description
@@ -28,6 +28,7 @@ class Book:
         self.rating = rating
         self.totalRatingCount = totalRatingCount
         self.link = link
+        self.id = str(kwargs.get("_id"))
 
     def to_dict(self) -> dict:
         return {
@@ -61,9 +62,10 @@ class Database:
         self.db = self.client['work']
         self.collection = self.db['books']
         self.cache = []
+        print("Logged in")
 
     def get_all_books(self):
-        self.cache = [Book(*i) for i in self.collection.find()]
+        self.cache = [Book(**i) for i in self.collection.find()]
         return self.cache
     
     def get_book_by_id(self, id):

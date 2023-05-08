@@ -1,5 +1,5 @@
-from ..utilities import Book, Database
-from ..utilities import BookSchema, SearchSchema
+from utilities import Book, Database
+from utilities import BookSchema, SearchSchema
 from fastapi import APIRouter, Response
 from json import dumps
 
