@@ -60,15 +60,20 @@ class Database:
         self.client = pymongo.MongoClient(self.uri)
         self.db = self.client['work']
         self.collection = self.db['books']
+        self.cache = []
 
     def get_all_books(self):
-        return [Book(*i) for i in self.collection.find()]
+        self.cache = [Book(*i) for i in self.collection.find()]
+        return self.cache
     
     def get_book_by_id(self, id):
         return Book(*self.collection.find_one({"_id": id}))
     
     def search_book(self, query):
         return self.collection.find({"$text": {"$search": query}})
+    
+    def local_search(self, query):
+        return [book for book in self.cache if query in book.title.lower() or query in book.author.lower()]
     
     def add_book(self, book: Book):
         self.collection.insert_one(book.to_dict())

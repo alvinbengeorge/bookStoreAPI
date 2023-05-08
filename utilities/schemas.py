@@ -10,7 +10,8 @@ class BookSchema(BaseModel):
     image: str
     link: str
     
-
+class SearchSchema(BaseModel):
+    query: str
 
 class UpdateBookRating(BaseModel):
     rating: float
