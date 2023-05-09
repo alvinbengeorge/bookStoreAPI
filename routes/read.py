@@ -6,20 +6,16 @@ from json import dumps
 router = APIRouter()
 db = Database()
 
+
 @router.get("/book/{id}")
 def get_book(id: str):
     book = db.get_book(id)
     if book:
-        return Response(
-            book.to_json(),
-            status_code=200,
-            media_type="application/json"
-        )
+        return Response(book.to_json(), status_code=200, media_type="application/json")
     return Response(
-        "Book not found",
-        status_code=404,
-        media_type="application/json"
+        {"message": "Book not found"}, status_code=404, media_type="application/json"
     )
+
 
 @router.get("/book")
 def get_all_books():
@@ -27,14 +23,31 @@ def get_all_books():
     return Response(
         dumps([book.to_dict() for book in books]),
         status_code=200,
-        media_type="application/json"
+        media_type="application/json",
     )
 
-@router.post("/book/search")
+
+@router.post("/search")
 async def search(search: SearchSchema):
     result = db.search_book(search.query.lower())
+    return Response(dumps(result), status_code=200, media_type="application/json")
+
+
+@router.post("/cache-search")
+async def search_cache(query: str):
+    result = db.local_search(query.lower())
     return Response(
-        dumps(result),
+        dumps([book.to_dict() for book in result]),
         status_code=200,
-        media_type="application/json"
+        media_type="application/json",
+    )
+
+
+@router.get("/author")
+async def search_author(query: str):
+    result = db.search_author(query.lower())
+    return Response(
+        dumps([book.to_dict() for book in result]),
+        status_code=200,
+        media_type="application/json",
     )
