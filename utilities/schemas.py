@@ -8,6 +8,7 @@ class BookSchema(BaseModel):
     price: int
     image: str
     link: str
+    availableCopies: int
 
 
 class SearchSchema(BaseModel):
@@ -15,8 +16,10 @@ class SearchSchema(BaseModel):
 
 
 class UpdateBookRating(BaseModel):
+    id: str
     rating: float
 
 
 class UpdateBookCopies(BaseModel):
+    id: str
     noOfCopies: int

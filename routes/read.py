@@ -9,11 +9,13 @@ db = Database()
 
 @router.get("/book/{id}")
 def get_book(id: str):
-    book = db.get_book(id)
+    book = db.get_book_by_id(id)
     if book:
-        return Response(book.to_json(), status_code=200, media_type="application/json")
+        return Response(
+            dumps(book.to_json(id=id)), status_code=200, media_type="application/json"
+        )
     return Response(
-        {"message": "Book not found"}, status_code=404, media_type="application/json"
+        dumps({"message": "Book not found"}), status_code=404, media_type="application/json"
     )
 
 
@@ -21,7 +23,7 @@ def get_book(id: str):
 def get_all_books():
     books = db.get_all_books()
     return Response(
-        dumps([book.to_dict() for book in books]),
+        dumps([book.to_dict(book.kwargs.get("_id")) for book in books]),
         status_code=200,
         media_type="application/json",
     )
@@ -47,7 +49,7 @@ async def search_cache(query: str):
 async def search_author(query: str):
     result = db.search_author(query.lower())
     return Response(
-        dumps([book.to_dict() for book in result]),
+        dumps([book.to_dict(book.kwargs.get("_id")) for book in result]),
         status_code=200,
         media_type="application/json",
     )

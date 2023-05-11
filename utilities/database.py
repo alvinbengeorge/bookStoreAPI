@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 from json import dumps
 from typing import List
+from bson.objectid import ObjectId
 
 load_dotenv()
 
@@ -32,10 +33,11 @@ class Book:
         self.availableCopies = availableCopies
         self.totalRatingCount = totalRatingCount
         self.link = link
-        self.id = str(kwargs.get("_id"))
+        self.args = args
+        self.kwargs = kwargs
 
-    def to_dict(self) -> dict:
-        return {
+    def to_dict(self, id: str = None) -> dict:
+        d = {
             "title": self.title,
             "author": self.author,
             "description": self.description,
@@ -45,11 +47,13 @@ class Book:
             "rating": self.rating,
             "totalRatingCount": self.totalRatingCount,
             "availableCopies": self.availableCopies,
-            "id": self.id,
         }
+        if id:
+            d["id"] = str(id)
+        return d
 
-    def to_json(self) -> str:
-        return dumps(self.to_dict())
+    def to_json(self, id: str = None) -> str:
+        return dumps(self.to_dict(id=id))
 
     def addRating(self, rating: float) -> "Book":
         self.rating = self.rating + rating / self.totalRatingCount
@@ -81,8 +85,9 @@ class Database:
     def search_author(self, query):
         return [Book(**i) for i in self.collection.find({"author": query})]
 
-    def get_book_by_id(self, id):
-        return Book(*self.collection.find_one({"_id": id}))
+    def get_book_by_id(self, id: str):
+        book = self.collection.find_one({"_id": ObjectId(id)})
+        return Book(**book) if book else None
 
     def search_book(self, query):
         return self.collection.find({"$text": {"$search": query}})
@@ -97,5 +102,12 @@ class Database:
     def add_book(self, book: Book):
         self.collection.insert_one(book.to_dict())
 
-    def update_book(self, book: Book):
-        self.collection.update_one({"_id": book.id}, {"$set": book.to_dict()})
+    def update_book(self, book: Book, id: str):
+        self.collection.update_one({"_id": ObjectId(id)}, {"$set": book.to_dict(id=id)})
+
+
+if __name__ == "__main__":
+    db = Database()
+    a = [book.kwargs.get("_id") for book in db.get_all_books()]
+
+    print(db.get_book_by_id(a[0]))
