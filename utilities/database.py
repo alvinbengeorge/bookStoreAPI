@@ -19,7 +19,7 @@ class Book:
         image: str,
         link: str,
         rating: float = 0,
-        totalRatingCount: int = 1,
+        totalRatingCount: int = 0,
         availableCopies: int = 1,
         *args,
         **kwargs,
@@ -56,7 +56,9 @@ class Book:
         return dumps(self.to_dict(id=id))
 
     def addRating(self, rating: float) -> "Book":
-        self.rating = self.rating + rating / self.totalRatingCount
+        self.rating = (
+            (self.rating * self.totalRatingCount) + rating
+        ) / self.totalRatingCount + 1
         self.totalRatingCount += 1
         return self
 
@@ -104,6 +106,9 @@ class Database:
 
     def update_book(self, book: Book, id: str):
         self.collection.update_one({"_id": ObjectId(id)}, {"$set": book.to_dict(id=id)})
+
+    def delete_book(self, id: str):
+        self.collection.delete_one({"_id": ObjectId(id)})
 
 
 if __name__ == "__main__":

@@ -15,7 +15,9 @@ def get_book(id: str):
             dumps(book.to_json(id=id)), status_code=200, media_type="application/json"
         )
     return Response(
-        dumps({"message": "Book not found"}), status_code=404, media_type="application/json"
+        dumps({"message": "Book not found"}),
+        status_code=404,
+        media_type="application/json",
     )
 
 
